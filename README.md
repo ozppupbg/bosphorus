@@ -138,7 +138,7 @@ sudo apt-get install build-essential cmake zlib1g-dev \
 ```
 
 ### Install BRiAl
-Try installing using `apt-get install brial-dev`. If that does not work, compile and install from source:
+Try installing using `apt-get install libbrial-dev`. If that does not work, compile and install from source:
 ```
 git clone --depth 1 https://github.com/BRiAl/BRiAl
 cd BRiAl
