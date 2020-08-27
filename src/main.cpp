@@ -63,6 +63,7 @@ bool writeANF;
 bool writeCNF;
 bool solve_with_cms;
 bool all_solutions;
+uint32_t max_solutions = 0;
 int only_new_cnf_clauses = 0;
 uint32_t maxiters = 100;
 
@@ -104,6 +105,7 @@ void parseOptions(int argc, char* argv[])
     ("solve", po::bool_switch(&solve_with_cms), "Solve the resulting ANF")
     ("solvewrite", po::value(&solution_output_file), "Solve the resulting ANF and print the solution to this file")
     ("allsol", po::bool_switch(&all_solutions), "Find all solutions")
+    ("maxsol", po::value<uint32_t>(&max_solutions), "Find at most this many solutions")
     ("maxiters", po::value(&maxiters)->default_value(maxiters),
      "Maximum iterations to simplify")
 
@@ -235,6 +237,11 @@ void parseOptions(int argc, char* argv[])
 
     if (readANF && readCNF) {
         cout << "You cannot give both ANF/CNF files to read in\n";
+        exit(-1);
+    }
+
+    if (all_solutions && max_solutions) {
+        cout << "You cannot request all solutions and set a maximum at the same time\n";
         exit(-1);
     }
 
@@ -484,10 +491,16 @@ void solve(Bosph::Bosphorus* mylib, CNF* cnf, ANF* anf) {
         }
         ban_solution(solver, solution);
         number_of_solutions++;
+        if (number_of_solutions >= max_solutions) {
+            break;
+        }
     }
 
     if (all_solutions) {
         cout << "c Number of solutions found: " << number_of_solutions << endl;
+    }
+    if (max_solutions) {
+        cout << "c Found " << number_of_solutions << " of the requested " << max_solutions << " solutions" << endl;
     }
 }
 
