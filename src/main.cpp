@@ -485,8 +485,7 @@ void solve(Bosph::Bosphorus* mylib, CNF* cnf, ANF* anf) {
         write_solution_to_file_cnf_style(solution);
         if (ret == CMSat::l_True) {
             check_solution(anf, solution);
-        }
-        if (ret == CMSat::l_False) {
+        } else {
             break;
         }
         number_of_solutions++;
