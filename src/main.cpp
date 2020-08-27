@@ -486,14 +486,14 @@ void solve(Bosph::Bosphorus* mylib, CNF* cnf, ANF* anf) {
         if (ret == CMSat::l_True) {
             check_solution(anf, solution);
         }
+        if (ret == CMSat::l_False) {
+            break;
+        }
         number_of_solutions++;
         if ((!all_solutions && !max_solutions) || (max_solutions && number_of_solutions >= max_solutions) || ret == CMSat::l_False) {
             break;
         }
         ban_solution(solver, solution);
-        if (number_of_solutions >= max_solutions) {
-            break;
-        }
     }
 
     if (all_solutions) {
