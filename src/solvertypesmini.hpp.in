@@ -177,7 +177,20 @@ public:
     lbool ret = l_Undef;
 };
 
-class Clause
+class GenericClause
+{
+   public:
+    size_t size() const;
+
+    bool empty() const;
+
+    template <class T>
+    std::vector<T> getClause() const;
+
+    friend std::ostream& operator<<(std::ostream& os, const GenericClause& cl);
+};
+
+class Clause: public GenericClause
 {
    public:
     Clause(const vector<Lit>& _lits) : lits(_lits)
@@ -230,6 +243,14 @@ inline std::ostream& operator<<(std::ostream& os, const Clause& cl)
 }
 
 inline std::ostream& operator<<(std::ostream& os, const vector<Clause>& clauses)
+{
+    for (const auto& it: clauses) {
+        os << it << std::endl;
+    }
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const vector<GenericClause>& clauses)
 {
     for (const auto& it: clauses) {
         os << it << std::endl;

@@ -34,11 +34,21 @@ namespace BLib {
 
 using std::vector;
 
-class XClause
+class XClause: public GenericClause<uint32_t>
 {
    public:
     XClause(const vector<uint32_t>& _vars, bool _rhs) : vars(_vars), rhs(_rhs)
     {
+    }
+
+    const vector<uint32_t>& getVars() const
+    {
+        return vars;
+    }
+
+    bool getRhs() const
+    {
+        return rhs;
     }
 
     size_t size() const
@@ -51,9 +61,14 @@ class XClause
         return vars.empty();
     }
 
+    std::vector<uint32_t> getClause() const
+    {
+        assert(!vars.empty));
+        return vars;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const XClause& xcl);
 
-   private:
     vector<uint32_t> vars;
     bool rhs;
 };
