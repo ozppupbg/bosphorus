@@ -34,6 +34,8 @@ using std::cout;
 using std::endl;
 using namespace BLib;
 
+namespace BLib {
+
 ANF::ANF(const polybori::BoolePolyRing* _ring, ConfigData& _config)
     : ring(_ring),
       config(_config),
@@ -381,6 +383,18 @@ bool ANF::addBoolePolynomial(const BoolePolynomial& poly)
     return true;
 }
 
+void ANF::addAdditionalCNF(Bosph::DIMACS* dim) {
+    auto dimacs = (BLib::DIMACSCache*)dim;
+    for (auto cls : dimacs->getClauses()) {
+        additionalCNF.addClause(cls);
+    }
+}
+
+
+void ANF::addAdditionalCNF(const Clause& cls) {
+    additionalCNF.addClause(cls);
+}
+
 bool ANF::addLearntBoolePolynomial(const BoolePolynomial& poly)
 {
     // Contextualize it to existing knowledge
@@ -685,3 +699,5 @@ void ANF::print_solution_map(std::ofstream* ofs)
 {
     replacer->print_solution_map(ofs);
 }
+
+} // namespace

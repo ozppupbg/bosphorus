@@ -34,6 +34,7 @@ SOFTWARE.
 #ifdef USE_CMS
 #include "cryptominisat5/solvertypesmini.h"
 #include "cryptominisat5/cryptominisat.h"
+#include "dimacscache.hpp"
 #endif
 #include "bosphorus/solvertypesmini.hpp"
 #include <boost/program_options.hpp>
@@ -50,7 +51,9 @@ namespace po = boost::program_options;
 string anfInput;
 string anfOutput;
 string cnfInput;
+string cnfAdditionalInput;
 string cnfOutput;
+string xcnfOutput;
 string solution_output_file;
 
 //solution map
@@ -59,8 +62,10 @@ string solmap_file_write;
 // read/write
 bool readANF;
 bool readCNF;
+bool readAddCNF;
 bool writeANF;
 bool writeCNF;
+bool writeXCNF;
 bool solve_with_cms;
 bool all_solutions;
 uint32_t max_solutions = 0;
@@ -96,8 +101,10 @@ void parseOptions(int argc, char* argv[])
     // Input/Output
     ("anfread", po::value(&anfInput), "Read ANF from this file")
     ("cnfread", po::value(&cnfInput), "Read CNF from this file")
+    ("addcnfread", po::value(&cnfAdditionalInput), "Read additional CNF from this file")
     ("anfwrite", po::value(&anfOutput), "Write ANF output to file")
     ("cnfwrite", po::value(&cnfOutput), "Write CNF output to file")
+    ("xcnfwrite", po::value(&xcnfOutput), "Write CNF extended with XOR output to file")
     ("verb,v", po::value<uint32_t>(&config.verbosity)->default_value(config.verbosity),
      "Verbosity setting: 0(slient) - 3(noisy)")
     ("simplify", po::value<int>(&config.simplify)->default_value(config.simplify),
@@ -224,11 +231,17 @@ void parseOptions(int argc, char* argv[])
     if (vm.count("cnfread")) {
         readCNF = true;
     }
+    if (vm.count("addcnfread")) {
+        readAddCNF = true;
+    }
     if (vm.count("anfwrite")) {
         writeANF = true;
     }
     if (vm.count("cnfwrite")) {
         writeCNF = true;
+    }
+    if (vm.count("xcnfwrite")) {
+        writeXCNF = true;
     }
 
     if (vm.count("solvewrite")) {
@@ -237,6 +250,11 @@ void parseOptions(int argc, char* argv[])
 
     if (readANF && readCNF) {
         cout << "You cannot give both ANF/CNF files to read in\n";
+        exit(-1);
+    }
+
+    if (readANF && readAddCNF) {
+        cout << "You cannot give an additaional CNF file for an ANF to read in\n";
         exit(-1);
     }
 
@@ -348,6 +366,14 @@ int main(int argc, char* argv[])
         }
     }
     assert(anf != NULL);
+    if (readAddCNF) {
+        double parseStartTime = cpuTime();
+        mylib.read_additional_cnf(cnfAdditionalInput.c_str(), anf);
+        if (config.verbosity) {
+            cout << "c [Additional CNF Input] read in T: " << (cpuTime() - parseStartTime)
+                 << endl;
+        }
+    }
     if (config.verbosity >= 1) {
         Bosphorus::print_stats(anf);
     }

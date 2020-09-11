@@ -193,6 +193,12 @@ Bosph::DIMACS* Bosphorus::parse_cnf(const char* fname)
     return (Bosph::DIMACS*)dimacs;
 }
 
+void Bosphorus::read_additional_cnf(const char* fname, ANF* anf)
+{
+    Bosph::DIMACS* dimacs = parse_cnf(fname);
+    ((BLib::ANF*)anf)->addAdditionalCNF(dimacs);
+}
+
 Bosph::DIMACS* Bosphorus::new_dimacs()
 {
     BLib::DIMACSCache* dimacs = new BLib::DIMACSCache();
@@ -668,6 +674,9 @@ vector<Clause> Bosphorus::get_clauses(CNF* c)
         for(const auto&c : cls.first) {
             ret.push_back(c);
         }
+    }
+    for(const auto& cls: cnf->getAdditionalCNF()) {
+        ret.push_back(cls);
     }
     return ret;
 }

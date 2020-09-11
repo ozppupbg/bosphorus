@@ -30,9 +30,13 @@ SOFTWARE.
 #include <vector>
 
 #include "anf.hpp"
+#include "bosphorus.hpp"
+#include "dimacscache.hpp"
 #include "bosphorus/solvertypesmini.hpp"
 
+
 namespace BLib {
+
 
 class CNF
 {
@@ -63,11 +67,18 @@ class CNF
     uint32_t getVarForMonom(const BooleMonomial& mono) const;
     size_t getNumClauses() const;
     size_t getAddedAsCNF() const;
+    size_t getAddedAsAdditionalCNF() const;
     size_t getAddedAsANF() const;
     size_t getAddedAsSimpleANF() const;
     size_t getAddedAsComplexANF() const;
     const vector<pair<vector<Clause>, BoolePolynomial> >& getClauses() const;
     vector<Clause> get_clauses_simple() const;
+    void addAdditionalCNF(Bosph::DIMACS* dim);
+    void addAdditionalCNF(const Clause& cls);
+    const vector<Clause>& getAdditionalCNF() const {
+        const auto &clss = additionalCNF.getClauses();
+        return clss;
+    }
     uint32_t getNumVars() const;
     uint64_t getNumAllLits() const;
     uint64_t getNumAllClauses() const;
@@ -102,6 +113,9 @@ class CNF
     vector<pair<vector<Clause>, BoolePolynomial> > clauses;
     ANF::eqs_hash_t in_clauses;
 
+    //The additional CNF clauses
+    BLib::DIMACSCache additionalCNF;
+
     //uint32_t maps -- internal/external mapping of variables/monomial/polynomials
     std::unordered_map<BooleMonomial::hash_type, uint32_t>
         monomMap; // map: outside monom -> inside var
@@ -114,6 +128,7 @@ class CNF
     size_t addedAsSimpleANF = 0;
     size_t addedAsComplexANF = 0;
     size_t addedAsCNF = 0;
+    size_t addedAsAdditionalCNF = 0;
 };
 
 inline void CNF::print_without_header(std::ostream& os) const
@@ -124,6 +139,14 @@ inline void CNF::print_without_header(std::ostream& os) const
             os << "c " << set_of_cls.second << std::endl;
             os << "c ------------\n";
         }
+    }
+    const auto& additionalCNF = getAdditionalCNF();
+    if (!additionalCNF.empty() && config.writecomments) {
+        os << "c Additional CNF" << std::endl;
+        os << "c ------------\n";
+    }
+    for (const auto& cls: getAdditionalCNF()) {
+        os << cls;
     }
 }
 
@@ -142,12 +165,17 @@ inline bool CNF::varRepresentsMonomial(const uint32_t var) const
 
 inline size_t CNF::getNumClauses() const
 {
-    return clauses.size();
+    return clauses.size() + getAdditionalCNF().size();
 }
 
 inline size_t CNF::getAddedAsCNF() const
 {
     return addedAsCNF;
+}
+
+inline size_t CNF::getAddedAsAdditionalCNF() const
+{
+    return addedAsAdditionalCNF;
 }
 
 inline size_t CNF::getAddedAsANF() const
@@ -185,6 +213,7 @@ inline void CNF::printStats() const
          << "c Added as CNF         : " << getAddedAsCNF() << endl
          << "c Added as simple ANF  : " << getAddedAsSimpleANF() << endl
          << "c Added as complex  ANF: " << getAddedAsComplexANF() << endl
+         << "c Additional CNF       : " << getAddedAsAdditionalCNF() << endl
          << "c --------------------" << endl;
 }
 

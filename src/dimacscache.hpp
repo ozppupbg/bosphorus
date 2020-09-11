@@ -37,6 +37,7 @@ class DIMACSCache
 
     DIMACSCache(const char* _fname);
     void addClause(const Lit* lits, const uint32_t size);
+    void addClause(const Clause& cls);
 
     uint32_t getMaxVar(void) const
     {

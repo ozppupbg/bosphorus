@@ -45,6 +45,14 @@ void DIMACSCache::addClause(const Lit* lits, const uint32_t size)
     }
 }
 
+void DIMACSCache::addClause(const Clause& cls)
+{
+    clauses.push_back(cls);
+    for(auto lit : cls.getLits()) {
+        maxVar = std::max<uint32_t>(maxVar, lit.var()+1);
+    }
+}
+
 DIMACSCache::DIMACSCache(const char* _fname)
 {
     if (_fname == fname)

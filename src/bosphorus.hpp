@@ -52,6 +52,7 @@ public:
     // To read CNF or ANF
     ANF* read_anf(const char* fname);
     ANF* read_cnf(const char* fname);
+    void read_additional_cnf(const char* fname, ANF* anf);
     DIMACS* parse_cnf(const char* fname);
     ANF* chunk_dimacs(DIMACS* dimacs);
     DIMACS* new_dimacs();

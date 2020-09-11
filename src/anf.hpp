@@ -41,6 +41,8 @@ SOFTWARE.
 #include "evaluator.hpp"
 #include "polybori.h"
 #include "replacer.hpp"
+#include "bosphorus.hpp"
+#include "dimacscache.hpp"
 
 USING_NAMESPACE_PBORI
 
@@ -87,7 +89,8 @@ class ANF
 
     // others
     inline void setNOTOK(void);
-
+    void addAdditionalCNF(DIMACS* dim);
+    void addAdditionalCNF(const Clause& cls);
     // Query functions
     size_t size() const;
     size_t deg() const;
@@ -102,6 +105,10 @@ class ANF
     const vector<BoolePolynomial>& getEqs() const;
     inline const vector<lbool>& getFixedValues() const;
     inline const eqs_hash_t& getEqsHash(void) const;
+    const vector<Clause>& getAdditionalCNF() const {
+        const auto &clss = additionalCNF.getClauses();
+        return clss;
+    }
     const vector<vector<size_t> >& getOccur() const;
     inline bool getOK() const;
     bool evaluate(const vector<lbool>& vals) const;
@@ -140,6 +147,9 @@ class ANF
     Replacer* replacer;
     vector<vector<size_t> >
         occur; //occur[var] -> index of polys where the variable occurs
+
+    // The additional CNF clauses
+    BLib::DIMACSCache additionalCNF;
 
     size_t new_equations_begin = 0;
 

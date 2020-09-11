@@ -31,6 +31,8 @@ SOFTWARE.
 
 using namespace BLib;
 
+namespace BLib {
+
 CNF::CNF(const ANF& _anf, const ConfigData& _config)
     : anf(_anf), config(_config)
 {
@@ -41,6 +43,11 @@ CNF::CNF(const ANF& _anf, const ConfigData& _config)
     const vector<BoolePolynomial>& eqs = anf.getEqs();
     for (const BoolePolynomial& poly : eqs) {
         addBoolePolynomial(poly);
+    }
+    // Add additional clauses
+    const vector<Clause>& clss = anf.getAdditionalCNF();
+    for (const Clause& cls : clss) {
+        addAdditionalCNF(cls);
     }
 }
 
@@ -68,6 +75,11 @@ CNF::CNF(const char* fname,
         clauses.push_back(std::make_pair(clauses_needed_for_anf_import, eq));
     }
 
+    // Add additional clauses
+    const vector<Clause>& clss = anf.getAdditionalCNF();
+    for (const Clause& cls : clss) {
+        addAdditionalCNF(cls);
+    }
 }
 
 size_t CNF::update()
@@ -101,6 +113,17 @@ void CNF::init()
             cout << "c [CNF-out] added UNSAT to CNF" << endl;
         }
     }
+}
+
+void CNF::addAdditionalCNF(Bosph::DIMACS* dim) {
+    auto dimacs = (BLib::DIMACSCache*)dim;
+    for (auto cls : dimacs->getClauses()) {
+        additionalCNF.addClause(cls);
+    }
+}
+
+void CNF::addAdditionalCNF(const Clause& cls) {
+    additionalCNF.addClause(cls);
 }
 
 void CNF::addTrivialEquations()
@@ -464,3 +487,5 @@ vector<Clause> CNF::get_clauses_simple() const
     }
     return ret;
 }
+
+} // namespace

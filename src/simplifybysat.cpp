@@ -30,7 +30,7 @@ using std::endl;
 
 using namespace BLib;
 
-inline bool testSolution(const ANF& anf, const vector<lbool>& solution)
+inline bool testSolution(const BLib::ANF& anf, const vector<lbool>& solution)
 {
     bool goodSol = anf.evaluate(solution);
     if (!goodSol) {
@@ -40,7 +40,7 @@ inline bool testSolution(const ANF& anf, const vector<lbool>& solution)
     return goodSol;
 }
 
-SimplifyBySat::SimplifyBySat(const CNF& _cnf, const ConfigData& _config)
+SimplifyBySat::SimplifyBySat(const BLib::CNF& _cnf, const ConfigData& _config)
     : config(_config), cnf(_cnf)
 {
     // Create SAT solver
